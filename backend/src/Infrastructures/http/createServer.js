@@ -11,14 +11,7 @@ const ClientError = require('../../Commons/exceptions/ClientError');
 const createServer = async (container) => {
     const server = Hapi.server({
         host: config.app.host,
-        port: config.app.port,
-        routes: {
-            cors: {
-                origin: ['*'],
-                headers: ['Accept', 'Authorization', 'Content-Type', 'If-None-Match'],
-                additionalHeaders: ['X-Requested-With']
-            }
-        }
+        port: config.app.port
     });
 
     await server.register([
