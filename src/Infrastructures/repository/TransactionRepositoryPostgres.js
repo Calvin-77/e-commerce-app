@@ -25,7 +25,14 @@ class TransactionRepositoryPostgres extends TransactionRepository {
         };
 
         const result = await this._pool.query(query);
-        return result.rows;
+        return result.rows.map(row => ({
+            id: row.id,
+            userId: row.user_id,
+            movieId: row.movie_id,
+            type: row.type,
+            amount: row.amount,
+            date: row.date,
+        }));
     }
 
     async getUserTransactionHistory(userId) {

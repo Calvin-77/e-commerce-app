@@ -5,6 +5,14 @@ const routes = (handler) => ([
         handler: handler.postUserHandler,
     },
     {
+        method: 'GET',
+        path: '/users/profile',
+        handler: handler.getUserProfileHandler,
+        options: {
+            auth: 'tugaswebdesign_jwt',
+        },
+    },
+    {
         method: 'PUT',
         path: '/users/profile',
         handler: handler.updateUserProfileHandler,

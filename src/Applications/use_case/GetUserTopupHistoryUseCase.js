@@ -7,7 +7,7 @@ class GetUserTopupHistoryUseCase {
         const { userId } = useCasePayload;
         
         const transactions = await this._transactionRepository.getUserTransactions(userId);
-        return transactions.filter(transaction => transaction.type === 'topup');
+        return transactions;
     }
 }
 

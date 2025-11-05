@@ -1,6 +1,7 @@
 const AddUserUseCase = require('../../../../Applications/use_case/AddUserUseCase');
 const UpdateUserProfileUseCase = require('../../../../Applications/use_case/UpdateUserProfileUseCase');
 const GetUserPurchasedMoviesUseCase = require('../../../../Applications/use_case/GetUserPurchasedMoviesUseCase');
+const GetUserProfileUseCase = require('../../../../Applications/use_case/GetUserProfileUseCase');
 
 class UsersHandler {
     constructor(container) {
@@ -9,6 +10,7 @@ class UsersHandler {
         this.postUserHandler = this.postUserHandler.bind(this);
         this.updateUserProfileHandler = this.updateUserProfileHandler.bind(this);
         this.getUserPurchasedMoviesHandler = this.getUserPurchasedMoviesHandler.bind(this);
+        this.getUserProfileHandler = this.getUserProfileHandler.bind(this);
     }
 
     async postUserHandler(request, h) {
@@ -49,6 +51,18 @@ class UsersHandler {
             data: {
                 movies,
             },
+        });
+    }
+
+    async getUserProfileHandler(request, h) {
+        const { id: userId } = request.auth.credentials;
+
+        const getUserProfileUseCase = this._container.getInstance(GetUserProfileUseCase.name);
+        const user = await getUserProfileUseCase.execute({ userId });
+
+        return h.response({
+            status: 'success',
+            data: user,
         });
     }
 }

@@ -36,6 +36,7 @@ const UpdateMovieUseCase = require('../Applications/use_case/UpdateMovieUseCase'
 const DeleteMovieUseCase = require('../Applications/use_case/DeleteMovieUseCase');
 const UpdateUserProfileUseCase = require('../Applications/use_case/UpdateUserProfileUseCase');
 const GetUserPurchasedMoviesUseCase = require('../Applications/use_case/GetUserPurchasedMoviesUseCase');
+const GetUserProfileUseCase = require('../Applications/use_case/GetUserProfileUseCase');
 
 // creating container
 const container = createContainer();
@@ -362,6 +363,19 @@ container.register([
                 {
                     name: 'transactionRepository',
                     internal: TransactionRepository.name,
+                },
+            ],
+        },
+    },
+    {
+        key: GetUserProfileUseCase.name,
+        Class: GetUserProfileUseCase,
+        parameter: {
+            injectType: 'destructuring',
+            dependencies: [
+                {
+                    name: 'userRepository',
+                    internal: UserRepository.name,
                 },
             ],
         },
