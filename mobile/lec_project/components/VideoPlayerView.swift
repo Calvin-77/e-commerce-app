@@ -1,10 +1,3 @@
-//
-//  VideoPlayerView.swift
-//  lec_project
-//
-//  Universal video player supporting YouTube and Dailymotion
-//
-
 import SwiftUI
 import WebKit
 
@@ -26,7 +19,6 @@ struct VideoPlayerView: UIViewRepresentable {
         configuration.allowsAirPlayForMediaPlayback = true
         configuration.allowsPictureInPictureMediaPlayback = true
         
-        // Prevents opening links in external browser
         let preferences = WKWebpagePreferences()
         preferences.allowsContentJavaScript = true
         configuration.defaultWebpagePreferences = preferences
@@ -36,13 +28,12 @@ struct VideoPlayerView: UIViewRepresentable {
         webView.scrollView.bounces = false
         webView.backgroundColor = .black
         webView.isOpaque = false
-        webView.allowsLinkPreview = false // Prevent link previews that might open browser
+        webView.allowsLinkPreview = false
         
         return webView
     }
     
     func updateUIView(_ uiView: WKWebView, context: Context) {
-        // Set navigation delegate
         uiView.navigationDelegate = context.coordinator
         context.coordinator.onError = onError
         
@@ -74,8 +65,6 @@ struct VideoPlayerView: UIViewRepresentable {
         Coordinator()
     }
     
-    // MARK: - Platform Detection
-    
     private func detectPlatform(from urlString: String) -> VideoPlatform {
         let lowercased = urlString.lowercased()
         if lowercased.contains("youtube.com") || lowercased.contains("youtu.be") {
@@ -86,15 +75,12 @@ struct VideoPlayerView: UIViewRepresentable {
         return .unknown
     }
     
-    // MARK: - YouTube Support
-    
     private func loadYouTubeVideo(webView: WKWebView, videoID: String, context: Context) {
         let autoplayParam = isPlaying ? "1" : "0"
         let embedURL = "https://www.youtube.com/embed/\(videoID)?autoplay=\(autoplayParam)&playsinline=1&rel=0&modestbranding=1&controls=1&enablejsapi=1"
         
         let embedHTML = createVideoHTML(embedURL: embedURL, platform: .youtube)
         
-        // Only reload if the video ID or playing state has changed
         if context.coordinator.lastVideoID != videoID || context.coordinator.wasPlaying != isPlaying {
             context.coordinator.lastVideoID = videoID
             context.coordinator.wasPlaying = isPlaying
@@ -144,16 +130,13 @@ struct VideoPlayerView: UIViewRepresentable {
         return nil
     }
     
-    // MARK: - Dailymotion Support
-    
     private func loadDailymotionVideo(webView: WKWebView, videoID: String, context: Context) {
         let autoplayParam = isPlaying ? "1" : "0"
-        // Dailymotion embed URL with parameters for inline playback
+
         let embedURL = "https://www.dailymotion.com/embed/video/\(videoID)?autoplay=\(autoplayParam)&controls=1&mute=0&ui-theme=dark&ui-start-screen-info=0&endscreen-enable=0&sharing-enable=0"
         
         let embedHTML = createVideoHTML(embedURL: embedURL, platform: .dailymotion)
         
-        // Only reload if the video ID or playing state has changed
         if context.coordinator.lastVideoID != videoID || context.coordinator.wasPlaying != isPlaying {
             context.coordinator.lastVideoID = videoID
             context.coordinator.wasPlaying = isPlaying
@@ -165,16 +148,15 @@ struct VideoPlayerView: UIViewRepresentable {
     private func extractDailymotionID(from urlString: String) -> String? {
         let lowercased = urlString.lowercased()
         
-        // Format: https://dai.ly/VIDEO_ID (check this first as it's the shortest)
         if lowercased.contains("dai.ly/") {
             let components = urlString.components(separatedBy: "dai.ly/")
             if components.count > 1 {
                 var videoID = components[1]
-                // Remove query parameters if any
+
                 if let questionMarkIndex = videoID.firstIndex(of: "?") {
                     videoID = String(videoID[..<questionMarkIndex])
                 }
-                // Remove any trailing slashes or paths
+
                 if let slashIndex = videoID.firstIndex(of: "/") {
                     videoID = String(videoID[..<slashIndex])
                 }
@@ -184,16 +166,14 @@ struct VideoPlayerView: UIViewRepresentable {
                 }
             }
         }
-        // Format: https://www.dailymotion.com/video/VIDEO_ID
         else if lowercased.contains("dailymotion.com/video/") {
             let components = urlString.components(separatedBy: "dailymotion.com/video/")
             if components.count > 1 {
                 var videoID = components[1]
-                // Remove query parameters if any
+           
                 if let questionMarkIndex = videoID.firstIndex(of: "?") {
                     videoID = String(videoID[..<questionMarkIndex])
                 }
-                // Remove any trailing slashes or paths
                 if let slashIndex = videoID.firstIndex(of: "/") {
                     videoID = String(videoID[..<slashIndex])
                 }
@@ -203,7 +183,6 @@ struct VideoPlayerView: UIViewRepresentable {
                 }
             }
         }
-        // Format: https://www.dailymotion.com/embed/video/VIDEO_ID
         else if lowercased.contains("dailymotion.com/embed/video/") {
             let components = urlString.components(separatedBy: "dailymotion.com/embed/video/")
             if components.count > 1 {
@@ -223,8 +202,6 @@ struct VideoPlayerView: UIViewRepresentable {
         
         return nil
     }
-    
-    // MARK: - HTML Generation
     
     private func createVideoHTML(embedURL: String, platform: VideoPlatform) -> String {
         let platformName = platform == .youtube ? "YouTube" : "Dailymotion"
@@ -307,8 +284,6 @@ struct VideoPlayerView: UIViewRepresentable {
         """
     }
     
-    // MARK: - Coordinator
-    
     class Coordinator: NSObject, WKNavigationDelegate {
         var lastVideoID: String?
         var wasPlaying: Bool = false
@@ -324,22 +299,18 @@ struct VideoPlayerView: UIViewRepresentable {
         }
         
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-            // Prevent opening external links in Safari
-            // Only allow navigation within the same domain (for video embedding)
+
             if let url = navigationAction.request.url {
                 let urlString = url.absoluteString.lowercased()
                 
-                // Allow navigation to YouTube/Dailymotion embed domains
                 if urlString.contains("youtube.com/embed") || 
                    urlString.contains("dailymotion.com/embed") ||
                    urlString.contains("youtube.com/api") ||
                    urlString.contains("dailymotion.com/api") {
                     decisionHandler(.allow)
                 } else if navigationAction.navigationType == .linkActivated {
-                    // Block external links (like opening video in browser)
                     decisionHandler(.cancel)
                 } else {
-                    // Allow other navigation (like iframe loading)
                     decisionHandler(.allow)
                 }
             } else {

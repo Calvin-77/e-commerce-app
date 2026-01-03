@@ -99,13 +99,11 @@ struct RegisterView: View {
                         let user = try await controller.register(username: username, email: email, password: password)
                         await MainActor.run {
                             isLoading = false
-                            // Navigate to login after successful registration
                             navigateToLogin = true
                         }
                     } catch {
                         await MainActor.run {
                             isLoading = false
-                            // silently fail or add inline error state if needed
                         }
                     }
                 }

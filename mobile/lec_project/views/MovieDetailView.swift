@@ -56,10 +56,8 @@ struct MovieDetailView: View {
                 } else if let movie = movie {
                     VStack(spacing: 0) {
                         ScrollView {
-                            VStack(alignment: .leading, spacing: 16) {
-                                // Movie Image or Video
+                            VStack(alignment: .leading, spacing: 16) {  
                                 if movie.owned {
-                                    // Show Video Player if owned with Play Button
                                     ZStack {
                                         if let videoError = videoError {
                                             VStack(spacing: 16) {
@@ -104,7 +102,6 @@ struct MovieDetailView: View {
                                             .aspectRatio(16/9, contentMode: .fit)
                                             .clipped()
                                             
-                                            // Play Button Overlay
                                             if !isVideoPlaying {
                                                 Button(action: {
                                                     withAnimation {
@@ -131,12 +128,10 @@ struct MovieDetailView: View {
                                     .cornerRadius(12)
                                     .clipped()
                                 } else {
-                                    // Show Blurred Image with "Content Locked" if not owned
                                     ZStack {
                                         MovieImageView(imageString: movie.image, height: 300, cornerRadius: 0, aspectRatio: nil)
                                             .blur(radius: 20)
                                         
-                                        // Content Locked Overlay
                                         VStack(spacing: 16) {
                                             Image(systemName: "lock.fill")
                                                 .font(.system(size: 50))
@@ -162,7 +157,6 @@ struct MovieDetailView: View {
                                     .clipped()
                                 }
                                 
-                                // Movie Info
                                 Text(movie.title)
                                     .font(.title)
                                     .bold()
@@ -188,14 +182,12 @@ struct MovieDetailView: View {
                                     .foregroundColor(.gray)
                                     .padding(.top, 4)
                                 
-                                // Spacer for fixed button at bottom
                                 Spacer()
                                     .frame(height: 100)
                             }
                             .padding()
                         }
                         
-                        // Fixed button at bottom
                         VStack(spacing: 0) {
                             Divider()
                                 .background(Color.gray.opacity(0.3))
@@ -270,11 +262,11 @@ struct MovieDetailView: View {
     private func loadMovieDetail() async {
         isLoading = true
         errorMessage = nil
-        videoError = nil // Reset video error when loading new movie
+        videoError = nil
         do {
             let fetchedMovie = try await movieService.getMovieDetail(id: movieId)
             movie = fetchedMovie
-            videoError = nil // Reset video error when movie loaded successfully
+            videoError = nil
             isLoading = false
         } catch {
             errorMessage = "Failed to load movie details: \(error.localizedDescription)"
@@ -286,10 +278,8 @@ struct MovieDetailView: View {
         isLoading = true
         do {
             try await movieService.purchaseMovie(movieId: movieId)
-            // Refresh movie detail to update owned status
             await loadMovieDetail()
             
-            // Notify HomeView to refresh balance after successful purchase
             NotificationCenter.default.post(name: NSNotification.Name("MoviePurchased"), object: nil)
             isLoading = false
         } catch {
@@ -299,7 +289,6 @@ struct MovieDetailView: View {
     }
     
     private func formatYear(_ year: Int) -> String {
-        // Format year without thousand separators (2020, not 2.020)
         let formatter = NumberFormatter()
         formatter.numberStyle = .none
         formatter.groupingSeparator = ""
@@ -307,7 +296,6 @@ struct MovieDetailView: View {
     }
 }
 
-// YouTube Video Player View using WebKit
 struct YouTubeVideoView: UIViewRepresentable {
     let videoURL: String
     @Binding var isPlaying: Bool
@@ -328,7 +316,6 @@ struct YouTubeVideoView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: WKWebView, context: Context) {
-        // Set navigation delegate
         uiView.navigationDelegate = context.coordinator
         context.coordinator.onError = onError
         
@@ -337,11 +324,8 @@ struct YouTubeVideoView: UIViewRepresentable {
             return
         }
         
-        // Autoplay parameter based on isPlaying state
         let autoplayParam = isPlaying ? "1" : "0"
         
-        // Create embed URL with proper parameters to avoid error code 4
-        // Using minimal parameters for better compatibility
         let embedURL = "https://www.youtube.com/embed/\(youtubeID)?autoplay=\(autoplayParam)&playsinline=1&rel=0&modestbranding=1&controls=1&enablejsapi=1"
         
         let embedHTML = """
@@ -406,7 +390,6 @@ struct YouTubeVideoView: UIViewRepresentable {
         </html>
         """
         
-        // Only reload if the video ID or playing state has changed
         if context.coordinator.lastVideoID != youtubeID || context.coordinator.wasPlaying != isPlaying {
             context.coordinator.lastVideoID = youtubeID
             context.coordinator.wasPlaying = isPlaying
@@ -434,36 +417,28 @@ struct YouTubeVideoView: UIViewRepresentable {
         }
         
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-            // Allow navigation
             decisionHandler(.allow)
         }
     }
     
     private func extractYouTubeID(from urlString: String) -> String? {
-        // Extract video ID from various YouTube URL formats
         if urlString.contains("youtu.be/") {
-            // Format: https://youtu.be/VIDEO_ID or https://youtu.be/VIDEO_ID?si=...
             let components = urlString.components(separatedBy: "youtu.be/")
             if components.count > 1 {
                 var videoID = components[1]
-                // Remove query parameters if any
                 if let questionMarkIndex = videoID.firstIndex(of: "?") {
                     videoID = String(videoID[..<questionMarkIndex])
                 }
-                // Remove any trailing slashes
                 videoID = videoID.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
                 return videoID
             }
         } else if urlString.contains("youtube.com/embed/") {
-            // Format: https://www.youtube.com/embed/VIDEO_ID or https://www.youtube.com/embed/VIDEO_ID?si=...
             let components = urlString.components(separatedBy: "embed/")
             if components.count > 1 {
                 var videoID = components[1]
-                // Remove query parameters (like ?si=...)
                 if let questionMarkIndex = videoID.firstIndex(of: "?") {
                     videoID = String(videoID[..<questionMarkIndex])
                 }
-                // Remove any trailing slashes or paths
                 if let slashIndex = videoID.firstIndex(of: "/") {
                     videoID = String(videoID[..<slashIndex])
                 }
@@ -471,15 +446,12 @@ struct YouTubeVideoView: UIViewRepresentable {
                 return videoID
             }
         } else if urlString.contains("youtube.com/watch?v=") {
-            // Format: https://www.youtube.com/watch?v=VIDEO_ID
             let components = urlString.components(separatedBy: "v=")
             if components.count > 1 {
                 var videoID = components[1]
-                // Remove query parameters after video ID
                 if let ampersandIndex = videoID.firstIndex(of: "&") {
                     videoID = String(videoID[..<ampersandIndex])
                 }
-                // Remove any trailing parameters
                 if let questionMarkIndex = videoID.firstIndex(of: "?") {
                     videoID = String(videoID[..<questionMarkIndex])
                 }

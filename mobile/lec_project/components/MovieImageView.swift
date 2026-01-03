@@ -1,10 +1,3 @@
-//
-//  MovieImageView.swift
-//  lec_project
-//
-//  Created for handling both base64 and URL images
-//
-
 import SwiftUI
 
 struct MovieImageView: View {
@@ -13,21 +6,17 @@ struct MovieImageView: View {
     let cornerRadius: CGFloat
     let aspectRatio: CGFloat?
     
-    // For poster format (portrait 2:3)
     init(imageString: String?, height: CGFloat? = nil, cornerRadius: CGFloat = 8, aspectRatio: CGFloat? = nil) {
         self.imageString = imageString
         self.height = height
         self.cornerRadius = cornerRadius
-        // Default to poster aspect ratio (2:3) if no height specified
         self.aspectRatio = aspectRatio ?? (height == nil ? 2/3 : nil)
     }
     
     var body: some View {
         Group {
             if let imageString = imageString {
-                // Check if it's a URL (starts with http/https) or base64
                 if imageString.hasPrefix("http://") || imageString.hasPrefix("https://") {
-                    // URL image
                     if let url = URL(string: imageString) {
                         AsyncImage(url: url) { phase in
                             switch phase {
@@ -81,7 +70,6 @@ struct MovieImageView: View {
                         placeholderView
                     }
                 } else {
-                    // Assume it's base64 (no http prefix)
                     if let imageData = extractBase64Data(from: imageString),
                        let uiImage = UIImage(data: imageData) {
                         Group {
@@ -105,7 +93,6 @@ struct MovieImageView: View {
                         .clipped()
                         .cornerRadius(cornerRadius)
                     } else {
-                        // Fallback placeholder
                         placeholderView
                     }
                 }
@@ -141,17 +128,14 @@ struct MovieImageView: View {
     private func extractBase64Data(from base64String: String) -> Data? {
         var base64 = base64String
         
-        // Remove data URL prefix if present
         if base64String.hasPrefix("data:image") {
             if let commaIndex = base64String.firstIndex(of: ",") {
                 base64 = String(base64String[base64String.index(after: commaIndex)...])
             }
         }
         
-        // Remove whitespace
         base64 = base64.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Decode base64
         return Data(base64Encoded: base64, options: .ignoreUnknownCharacters)
     }
 }

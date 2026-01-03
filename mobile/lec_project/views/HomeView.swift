@@ -108,7 +108,7 @@ struct HomeView: View {
                     do {
                         movies = try await controller.getAllMovies()
                     } catch {
-                        // Error fetching movies
+
                     }
                     
                     await refreshBalance()
@@ -149,7 +149,7 @@ struct HomeView: View {
                 let user = try await authController.getProfile()
                 balance = user.balanceValue
             } catch {
-                // Could not get balance
+
             }
         }
     }

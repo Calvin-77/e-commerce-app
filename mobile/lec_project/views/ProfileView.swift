@@ -42,7 +42,6 @@ struct ProfileView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 24)
                 
-                        // name
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Name")
                                 .font(.caption)
@@ -67,7 +66,6 @@ struct ProfileView: View {
                         }
                         .padding(.horizontal, 24)
                         
-                        // email
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Email")
                                 .font(.caption)
@@ -93,7 +91,6 @@ struct ProfileView: View {
                         }
                         .padding(.horizontal, 24)
                         
-                        // password
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Password")
                                 .font(.caption)
@@ -118,10 +115,8 @@ struct ProfileView: View {
                                 
                                 Button(action: {
                                     if isEditingPassword {
-                                        // Selesai edit, kosongkan password field
                                         isEditingPassword = false
                                     } else {
-                                        // Mulai edit, kosongkan password untuk input baru
                                         password = ""
                                         isEditingPassword = true
                                     }
@@ -145,13 +140,11 @@ struct ProfileView: View {
                                     let passwordParam = trimmedPassword.isEmpty ? nil : trimmedPassword
                                     try await authController.updateProfile(username: nameParam, email: emailParam, password: passwordParam)
                                     
-                                    // Reset editing states setelah save
                                     isEditingName = false
                                     isEditingEmail = false
                                     isEditingPassword = false
-                                    password = "" // Reset password field
+                                    password = ""
                                 } catch {
-                                    // silently fail or add inline error state if needed
                                 }
                                 isSaving = false
                             }
@@ -167,10 +160,8 @@ struct ProfileView: View {
                         .padding(.horizontal, 24)
                         .padding(.top, 8)
                         
-                        // NavigationLink for redirect after logout
                         NavigationLink(destination: LogInView(), isActive: $navigateToLogin) { EmptyView() }
                         
-                        // button logout
                         Button(action: {
                             UserDefaults.standard.removeObject(forKey: "accessToken")
                             navigateToLogin = true
@@ -199,7 +190,6 @@ struct ProfileView: View {
                     name = user.username
                     email = user.email
                 } catch {
-                    // keep fields empty on failure
                 }
             }
         }

@@ -27,7 +27,6 @@ struct MovieCardDetail: View{
                 .scaledToFit()
                 .cornerRadius(10)
             } else {
-                // Kotak abu-abu polos jika tidak ada gambar
                 Rectangle()
                     .fill(Color.gray.opacity(0.3))
                     .aspectRatio(2/3, contentMode: .fit)

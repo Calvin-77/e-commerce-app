@@ -91,7 +91,6 @@ function Login() {
       if (data.status === 'success') {
         const role = data.data?.role
 
-        // Hanya izinkan admin mengakses dashboard web
         if (role !== 'admin') {
           console.log('Login blocked for non-admin user with role:', role)
           showToast('Only admin can access this dashboard.', 'error')

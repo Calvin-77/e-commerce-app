@@ -116,7 +116,6 @@ struct HistoryView: View {
         do {
             let fetchedTransactions = try await transactionController.getTransactionHistory()
             transactions = fetchedTransactions.sorted { t1, t2 in
-                // Sort by date descending (newest first)
                 return parseDate(t1.date) > parseDate(t2.date)
             }
             isLoading = false
@@ -133,7 +132,6 @@ struct HistoryView: View {
         if let date = isoFormatter.date(from: dateString) {
             return dateFormatter.string(from: date)
         } else {
-            // Try without fractional seconds
             let isoFormatter2 = ISO8601DateFormatter()
             if let date = isoFormatter2.date(from: dateString) {
                 return dateFormatter.string(from: date)

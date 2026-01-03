@@ -4,7 +4,6 @@ struct User: Codable {
     let email: String
     let balance: Int?
     
-    // Computed property untuk mendapatkan balance dengan default 0
     var balanceValue: Int {
         return balance ?? 0
     }

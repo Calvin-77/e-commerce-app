@@ -92,7 +92,6 @@ struct LibraryView: View {
         do {
             let movies = try await controller.getPurchasedMovie()
             purchasedMovies = movies.sorted { m1, m2 in
-                // Sort by purchase date descending (newest first)
                 return parseDate(m1.purchaseDate) > parseDate(m2.purchaseDate)
             }
             isLoading = false

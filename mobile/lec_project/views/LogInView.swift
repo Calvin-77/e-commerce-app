@@ -82,7 +82,6 @@ struct LogInView: View {
                         navigateToMain = true
                         isLoading = false
                     } catch {
-                        // silently fail or add inline error state if needed
                         isLoading = false
                     }
                 }
@@ -131,8 +130,6 @@ struct LogInView: View {
             focusedField = nil
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("RegistrationSuccessful"))) { _ in
-            // Registration successful, user is already back on login screen
-            // Optionally clear fields or show success message
             username = ""
             password = ""
         }

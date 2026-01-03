@@ -19,7 +19,6 @@ class TransactionRepositoryPostgres extends TransactionRepository {
     }
 
     async getUserTransactions(userId) {
-        // Get only topup transactions for topup history
         const query = {
             text: 'SELECT * FROM transactions WHERE user_id = $1 AND type = $2 ORDER BY date DESC',
             values: [userId, 'topup'],

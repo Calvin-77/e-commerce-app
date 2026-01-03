@@ -76,11 +76,9 @@ struct TopUpView: View {
                         isProcessing = true
                         do {
                             try await transactionController.topUpBalance(amount: amount)
-                            // Call success callback to refresh balance
                             onTopUpSuccess?()
                             dismiss()
                         } catch {
-                            // TODO: Show error alert to user
                         }
                         isProcessing = false
                     }
@@ -119,7 +117,6 @@ struct TopUpView: View {
             .toolbarBackground(Color(hex: 0x211111), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .onAppear {
-                // Reset selection when view appears
                 if selectedAmount == nil {
                     customAmount = ""
                 }

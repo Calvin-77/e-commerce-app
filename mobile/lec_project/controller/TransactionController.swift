@@ -26,7 +26,6 @@ class TransactionController: ObservableObject {
     }
 
     func getTransactionHistory() async throws -> [Transaction] {
-        // Get all transactions (topup + purchase) from /transactions/history endpoint
         let url = URL(string: "\(baseURL)/transactions/history")!
         
         var request = URLRequest(url: url)
@@ -40,7 +39,6 @@ class TransactionController: ObservableObject {
     }
     
     func getTopupHistory() async throws -> [Transaction] {
-        // Get only topup transactions for balance calculation
         let url = URL(string: "\(baseURL)/topup/history")!
         
         var request = URLRequest(url: url)
